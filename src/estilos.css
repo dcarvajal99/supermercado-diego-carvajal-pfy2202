@@ -1,0 +1,577 @@
+/* Despensa Austral · Diego Carvajal · PFY2202 Semana 1
+   Hoja de estilos propia: ajusta lo que Bootstrap no cubre con una paleta sobria de
+   cinco neutros, un acento verde y un rojo reservado a las alertas de stock. */
+
+/* 1. Paleta y tipografía */
+:root {
+    --da-blanco: #ffffff;
+    --da-gris-claro: #f7f7f8;
+    --da-borde: #e4e4e7;
+    --da-gris: #52525b;
+    --da-tinta: #18181b;
+    --da-acento: #166534;
+    --da-acento-rgb: 22, 101, 52;
+    --da-alerta: #b02a37;
+
+    --da-alto-menu: 4.25rem;
+
+    --bs-body-font-family: 'Inter', system-ui, sans-serif;
+    --bs-body-color: var(--da-tinta);
+    --bs-body-bg: var(--da-gris-claro);
+    --bs-border-color: var(--da-borde);
+    --bs-secondary-color: var(--da-gris);
+    /* Bootstrap 5.3 pinta los enlaces con las variables -rgb */
+    --bs-link-color: var(--da-acento);
+    --bs-link-color-rgb: var(--da-acento-rgb);
+    --bs-link-hover-color: var(--da-tinta);
+    --bs-link-hover-color-rgb: 24, 24, 27;
+    --bs-form-invalid-color: var(--da-alerta);
+    --bs-form-invalid-border-color: var(--da-alerta);
+}
+
+/* 2. Estructura */
+body {
+    min-height: 100vh;
+    /* Espacio para que el menú inferior fijo no tape el final de la página */
+    padding-bottom: calc(var(--da-alto-menu) + env(safe-area-inset-bottom));
+}
+
+.contenido {
+    padding-top: 1.75rem;
+    padding-bottom: 2rem;
+}
+
+/* El contenido recibe el foco al cambiar de página (tabIndex -1): sin contorno visible */
+.contenido:focus,
+[tabindex="-1"]:focus {
+    outline: none;
+}
+
+.encabezado-pagina {
+    margin-bottom: 1.5rem;
+}
+
+.encabezado-pagina h1 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: .375rem;
+}
+
+.lead {
+    font-size: 1.0625rem;
+    color: var(--da-gris);
+}
+
+h2,
+h3,
+.h5,
+.h6 {
+    font-weight: 600;
+}
+
+.panel {
+    background-color: var(--da-blanco);
+    border: 1px solid var(--da-borde);
+    border-radius: .5rem;
+    padding: 1.25rem;
+}
+
+.saltar {
+    position: absolute;
+    top: .5rem;
+    left: .5rem;
+    z-index: 1040;
+    padding: .5rem .75rem;
+    background-color: var(--da-tinta);
+    color: var(--da-blanco);
+    border-radius: .375rem;
+}
+
+code {
+    padding: .125rem .25rem;
+    border-radius: .25rem;
+    background-color: var(--da-borde);
+    color: var(--da-tinta);
+}
+
+.pie {
+    padding-bottom: 1.5rem;
+    font-size: .8125rem;
+    color: var(--da-gris);
+}
+
+/* 3. Foco visible y controles, sin sombras */
+.btn {
+    transition: none;
+}
+
+.btn:focus-visible,
+.form-control:focus,
+.form-select:focus,
+.btn-check:focus-visible + .btn,
+a:focus-visible,
+.cifra-boton:focus-visible {
+    outline: 2px solid var(--da-acento);
+    outline-offset: 2px;
+    box-shadow: none;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--da-acento);
+}
+
+.form-control.is-invalid:focus {
+    border-color: var(--da-alerta);
+    box-shadow: none;
+}
+
+/* 4. Cabecera */
+.cabecera {
+    background-color: var(--da-blanco);
+    border-bottom: 1px solid var(--da-borde);
+}
+
+.marca {
+    display: inline-flex;
+    align-items: center;
+    gap: .625rem;
+    color: var(--da-tinta);
+    font-weight: 600;
+    font-size: 1.125rem;
+    text-decoration: none;
+}
+
+.marca:hover {
+    color: var(--da-tinta);
+}
+
+.marca-icono rect {
+    fill: var(--da-acento);
+}
+
+.marca-icono path {
+    fill: none;
+    stroke: var(--da-blanco);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* 5. Menú inferior fijo */
+.menu-inferior {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1030;
+    background-color: var(--da-blanco);
+    border-top: 1px solid var(--da-borde);
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+.menu-inferior ul {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 36rem;
+    margin: 0 auto;
+    padding: 0;
+    list-style: none;
+}
+
+.menu-inferior a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .25rem;
+    min-height: var(--da-alto-menu);
+    margin-top: -1px;
+    padding: .5rem .25rem;
+    border-top: 2px solid transparent;
+    color: var(--da-gris);
+    font-size: .8125rem;
+    font-weight: 500;
+    text-align: center;
+    text-decoration: none;
+}
+
+.menu-inferior a:hover {
+    color: var(--da-tinta);
+}
+
+.menu-inferior a.activo {
+    border-top-color: var(--da-acento);
+    color: var(--da-acento);
+    font-weight: 600;
+}
+
+.menu-inferior a:focus-visible {
+    outline-offset: -4px;
+}
+
+.menu-inferior svg {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* 6. Resumen del inventario */
+/* Dos columnas en el teléfono y cuatro desde la tablet */
+.resumen {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .75rem;
+}
+
+@media (min-width: 768px) {
+    .resumen {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+.cifra {
+    display: flex;
+    flex-direction: column;
+    gap: .125rem;
+    padding: 1rem 1.125rem;
+    background-color: var(--da-blanco);
+    border: 1px solid var(--da-borde);
+    border-radius: .5rem;
+    text-align: left;
+    color: var(--da-tinta);
+}
+
+.cifra-boton {
+    cursor: pointer;
+}
+
+.cifra-boton:hover {
+    border-color: var(--da-gris);
+}
+
+/* Cifra elegida como filtro: borde de 2px del acento, sin cambiar el tamaño */
+.cifra-boton[aria-pressed="true"] {
+    border-color: var(--da-acento);
+    outline: 1px solid var(--da-acento);
+}
+
+.cifra-titulo {
+    font-size: .8125rem;
+    font-weight: 500;
+    color: var(--da-gris);
+}
+
+.cifra-valor {
+    font-size: 1.25rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+@media (min-width: 576px) {
+    .cifra-valor {
+        font-size: 1.5rem;
+    }
+}
+
+.cifra-alerta .cifra-valor {
+    color: var(--da-alerta);
+}
+
+.cifra-detalle {
+    font-size: .8125rem;
+    color: var(--da-gris);
+}
+
+/* 7. Tabla del inventario */
+.tabla-contenedor {
+    background-color: var(--da-blanco);
+    border: 1px solid var(--da-borde);
+    border-radius: .5rem;
+    overflow: hidden;
+}
+
+.tabla-inventario {
+    --bs-table-bg: var(--da-blanco);
+    --bs-table-border-color: var(--da-borde);
+    font-size: .9375rem;
+}
+
+.tabla-inventario th,
+.tabla-inventario td {
+    padding: .75rem 1rem;
+    vertical-align: middle;
+}
+
+.tabla-inventario thead th {
+    background-color: var(--da-gris-claro);
+    color: var(--da-gris);
+    font-size: .8125rem;
+    font-weight: 500;
+}
+
+.tabla-inventario tbody tr:last-child > * {
+    border-bottom: 0;
+}
+
+.celda-producto a {
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.celda-producto a:hover {
+    text-decoration: underline;
+}
+
+.celda-numero {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.ajuste {
+    display: inline-flex;
+    align-items: center;
+    gap: .375rem;
+}
+
+.ajuste .btn {
+    width: 2rem;
+    padding-inline: 0;
+    line-height: 1.2;
+}
+
+.ajuste .btn[aria-disabled="true"] {
+    opacity: .4;
+    cursor: not-allowed;
+}
+
+.ajuste-cifra {
+    min-width: 2.5rem;
+    text-align: center;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.vacio {
+    padding: 2rem 1rem;
+    background-color: var(--da-blanco);
+    border: 1px dashed var(--da-borde);
+    border-radius: .5rem;
+    text-align: center;
+    color: var(--da-gris);
+}
+
+.restablecer {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--da-borde);
+}
+
+/* En pantallas chicas cada fila de la tabla se vuelve un bloque: el producto arriba y
+   el resto en dos columnas, cada dato con su etiqueta (data-etiqueta). */
+@media (max-width: 767.98px) {
+    .tabla-inventario thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+    }
+
+    .tabla-inventario tr {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: .5rem 1rem;
+        padding: 1rem;
+        border-bottom: 1px solid var(--da-borde);
+    }
+
+    .tabla-inventario tbody tr:last-child {
+        border-bottom: 0;
+    }
+
+    .tabla-inventario th,
+    .tabla-inventario td {
+        display: block;
+        padding: 0;
+        border: 0;
+        text-align: left;
+    }
+
+    .tabla-inventario .celda-producto {
+        grid-column: 1 / -1;
+    }
+
+    .tabla-inventario td::before {
+        content: attr(data-etiqueta);
+        display: block;
+        font-size: .75rem;
+        color: var(--da-gris);
+    }
+}
+
+/* 8. Estados del stock: el texto dice el estado y el color lo refuerza */
+.estado {
+    display: inline-block;
+    padding: .125rem .5rem;
+    border: 1px solid var(--da-borde);
+    border-radius: 999px;
+    font-size: .75rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.estado-disponible {
+    border-color: var(--da-acento);
+    color: var(--da-acento);
+}
+
+.estado-bajo {
+    border-color: var(--da-alerta);
+    color: var(--da-alerta);
+}
+
+.estado-agotado {
+    border-color: transparent;
+    background-color: var(--da-alerta);
+    color: var(--da-blanco);
+}
+
+/* 9. Detalle del producto */
+.breadcrumb {
+    --bs-breadcrumb-item-active-color: var(--da-gris);
+}
+
+.breadcrumb a {
+    text-decoration: none;
+}
+
+.datos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.datos dt {
+    font-size: .8125rem;
+    font-weight: 500;
+    color: var(--da-gris);
+}
+
+.datos dd {
+    margin-bottom: 0;
+    font-variant-numeric: tabular-nums;
+}
+
+.dato-destacado {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.confirmacion:empty {
+    display: none;
+}
+
+.confirmacion {
+    padding: .5rem .75rem;
+    border-left: 2px solid var(--da-acento);
+    background-color: var(--da-gris-claro);
+}
+
+.otros-productos {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--da-borde);
+}
+
+.otros-productos a {
+    text-decoration: none;
+    font-weight: 500;
+}
+
+/* 10. Quiénes somos y Nuestras tiendas */
+/* Las líneas entre cifras son el fondo gris que asoma por el espacio de 1px entre celdas:
+   funcionan igual con cuatro columnas que con dos filas de dos. */
+.cifras-empresa {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    gap: 1px;
+    overflow: hidden;
+    border: 1px solid var(--da-borde);
+    border-radius: .5rem;
+    background-color: var(--da-borde);
+}
+
+.cifras-empresa > div {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 1.25rem;
+    background-color: var(--da-blanco);
+}
+
+.valores {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: 1rem 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.valores li {
+    padding-top: .75rem;
+    border-top: 2px solid var(--da-acento);
+}
+
+.tiendas {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.horario {
+    margin-bottom: 1rem;
+}
+
+.horario > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: .375rem 0;
+    border-bottom: 1px solid var(--da-borde);
+}
+
+.horario dt {
+    font-weight: 500;
+}
+
+.horario dd {
+    margin-bottom: 0;
+    color: var(--da-gris);
+}
+
+.servicios {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .375rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.servicios li {
+    padding: .125rem .5rem;
+    border: 1px solid var(--da-borde);
+    border-radius: 999px;
+    font-size: .75rem;
+    color: var(--da-gris);
+}
