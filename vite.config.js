@@ -1,18 +1,28 @@
-import { copyFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { copyFileSync, mkdirSync } from 'node:fs';
+import { dirname, join } from 'node:path';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { PRODUCTOS } from './src/datos/productos.js';
 
-// GitHub Pages no conoce las rutas de React Router: si alguien recarga
-// /quienes-somos, el servidor busca ese archivo, no lo encuentra y responde con
-// 404.html. Copiar index.html como 404.html hace que esa respuesta cargue la misma
-// aplicación, y BrowserRouter dibuja la página que corresponde a la URL.
-function copiarComo404() {
+// Rutas del sitio (las mismas de App.jsx), sin la barra inicial.
+const RUTAS = ['quienes-somos', 'nuestras-tiendas', ...PRODUCTOS.map((producto) => 'producto/' + producto.id)];
+
+// GitHub Pages no conoce las rutas de React Router: al recargar /quienes-somos busca
+// un archivo con ese nombre. Para cada ruta se copia index.html como <ruta>.html, que
+// Pages sirve con estado 200, y BrowserRouter dibuja la página que corresponde a la URL.
+// La copia 404.html atiende las direcciones que no existen: responde con estado 404,
+// carga la misma aplicación y React Router muestra la página «no encontrada».
+function copiarRutas() {
     return {
-        name: 'copiar-como-404',
+        name: 'copiar-rutas',
         apply: 'build',
         writeBundle(opciones) {
-            copyFileSync(join(opciones.dir, 'index.html'), join(opciones.dir, '404.html'));
+            const indice = join(opciones.dir, 'index.html');
+            for (const ruta of [...RUTAS, '404']) {
+                const destino = join(opciones.dir, ruta + '.html');
+                mkdirSync(dirname(destino), { recursive: true });
+                copyFileSync(indice, destino);
+            }
         },
     };
 }
@@ -22,5 +32,5 @@ function copiarComo404() {
 // y main.jsx usa la misma base para las rutas de React Router.
 export default defineConfig({
     base: '/supermercado-diego-carvajal-pfy2202/',
-    plugins: [react(), copiarComo404()],
+    plugins: [react(), copiarRutas()],
 });

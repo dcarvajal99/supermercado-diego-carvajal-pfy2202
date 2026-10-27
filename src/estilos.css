@@ -20,6 +20,9 @@
     --bs-body-bg: var(--da-gris-claro);
     --bs-border-color: var(--da-borde);
     --bs-secondary-color: var(--da-gris);
+    /* .text-secondary lee la variable -rgb: sin ella queda el gris de Bootstrap (#6c757d),
+       que no alcanza el contraste mínimo de 4,5:1 sobre el fondo gris claro */
+    --bs-secondary-rgb: 82, 82, 91;
     /* Bootstrap 5.3 pinta los enlaces con las variables -rgb */
     --bs-link-color: var(--da-acento);
     --bs-link-color-rgb: var(--da-acento-rgb);

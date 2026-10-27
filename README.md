@@ -62,19 +62,21 @@ Los filtros también viajan en la URL, así que se pueden compartir y sobreviven
   detalle ya está actualizado al volver al home.
 - **`useNavigate`**: «Volver a la página anterior» en la página no encontrada (solo si hay una página
   anterior dentro del sitio, según `useLocation().key`).
-- **Al cambiar de página** la `Plantilla` vuelve arriba y lleva el foco al contenido, y cada página
-  cambia el título de la pestaña (`useTituloPagina`): el teclado y el lector de pantalla parten
-  desde la página nueva.
-- **GitHub Pages y las rutas**: Pages no conoce las rutas de React Router, así que al recargar
-  `/quienes-somos` respondería 404. `vite.config.js` copia `index.html` como `404.html` al construir:
-  esa respuesta carga la misma aplicación y `BrowserRouter` muestra la página correcta.
+- **Al cambiar de página** la `Plantilla` salta al inicio (sin la animación de `scroll-behavior`
+  de Bootstrap) y lleva el foco al contenido, y cada página cambia el título de la pestaña
+  (`useTituloPagina`): el teclado y el lector de pantalla parten desde la página nueva.
+- **GitHub Pages y las rutas**: Pages no conoce las rutas de React Router; al recargar
+  `/quienes-somos` busca un archivo con ese nombre. Al construir, `vite.config.js` copia `index.html`
+  como `quienes-somos.html`, `nuestras-tiendas.html` y `producto/<id>.html` (Pages los sirve con estado
+  200) y como `404.html`, que atiende las direcciones que no existen: responde 404, carga la misma
+  aplicación y React Router muestra «Página no encontrada».
 
 ## Estructura del proyecto
 
 ```
 supermercado-diego-carvajal-pfy2202/
 ├── index.html                    Página que monta React (Bootstrap 5.3.8 e Inter por CDN)
-├── vite.config.js                Base de GitHub Pages y copia de index.html como 404.html
+├── vite.config.js                Base de GitHub Pages y copias de index.html por ruta y como 404.html
 ├── public/favicon.svg
 ├── src/
 │   ├── main.jsx                  BrowserRouter con basename
@@ -110,7 +112,7 @@ npm run dev        # abre http://localhost:5173/supermercado-diego-carvajal-pfy2
 Otros comandos:
 
 ```bash
-npm run build      # deja la versión publicable en dist/ (con 404.html)
+npm run build      # deja la versión publicable en dist/ (con una página por ruta y 404.html)
 npm run preview    # sirve dist/ en http://localhost:4173/supermercado-diego-carvajal-pfy2202/
 npm run lint       # revisa el código con oxlint
 npm run deploy     # construye y publica dist/ en la rama gh-pages
@@ -123,15 +125,22 @@ npm run deploy     # construye y publica dist/ en la rama gh-pages
   tiendas filtradas por región y página no encontrada).
 - W3C CSS Validator: hoja válida, 0 errores y 0 advertencias.
 - `oxlint`: sin avisos.
-- Recorrido en Chrome a 1280 px y a 375 px: navegación con el menú inferior, filtros en la URL,
-  Atrás y Adelante del navegador, apertura de un producto y regreso con los filtros, entrada y salida
-  con validación, cambio de producto con el formulario limpio, recarga directa de una ruta interna y
-  dirección inexistente.
+- Lighthouse sobre el sitio publicado (inventario, detalle de un producto, quiénes somos y nuestras
+  tiendas, en escritorio y teléfono): 100 en accesibilidad, buenas prácticas y SEO.
+- GitHub Pages responde 200 al abrir directo cualquier ruta del sitio y 404 solo en las direcciones
+  que no existen; la consola queda sin errores.
+- Recorrido en Chrome a 1280 px y a 390 px: navegación con el menú inferior sin recargar la página,
+  filtros en la URL, Atrás y Adelante del navegador, apertura de un producto y regreso con los filtros,
+  entrada y salida con validación, cambio de producto con el formulario limpio, recarga directa de una
+  ruta interna y dirección inexistente. Sin desborde horizontal a 390 px.
+- Instalación desde un clon limpio del repositorio con `npm install` (npm 10), `npm run lint` y
+  `npm run build`.
 
 ## Diseño
 
 Una sola tipografía (Inter), cinco neutros y un acento verde (`#166534`); el rojo `#b02a37` se
-reserva para las alertas de stock. Sin degradados ni sombras: la estructura se marca con espacio en
+reserva para las alertas de stock. El texto secundario usa el gris `#52525b` de la paleta (7,2:1 sobre
+el fondo), también en las clases `text-secondary` de Bootstrap. Sin degradados ni sombras: la estructura se marca con espacio en
 blanco y líneas de 1 px. En el teléfono la tabla del inventario se convierte en bloques con la
 etiqueta de cada dato.
 

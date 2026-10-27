@@ -20,7 +20,9 @@ function Plantilla() {
     useEffect(() => {
         if (rutaAnterior.current === pathname) return;
         rutaAnterior.current = pathname;
-        window.scrollTo(0, 0);
+        // instant: sin la animación de scroll-behavior: smooth de Bootstrap, la página
+        // nueva aparece arriba de inmediato.
+        window.scrollTo({ top: 0, behavior: 'instant' });
         contenido.current?.focus({ preventScroll: true });
     }, [pathname]);
 
