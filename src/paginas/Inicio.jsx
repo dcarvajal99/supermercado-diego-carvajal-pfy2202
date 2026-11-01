@@ -1,117 +1,67 @@
-// Home del sitio: el inventario del supermercado, con un resumen, los filtros y la
-// tabla de productos. Los filtros viven en la URL (?categoria=lacteos&estado=bajo):
-// se pueden compartir, se mantienen al recargar y el botón Atrás del navegador los respeta.
-import { useMemo, useRef, useState } from 'react';
-import { useOutletContext, useSearchParams } from 'react-router-dom';
+// Home del sitio: el panel del inventario. Resume el estado global en cuatro cifras y
+// muestra los artículos que hay que reponer; la tabla completa está en /articulos.
+import { useMemo } from 'react';
+import { Link } from 'react-router-dom';
+import EstadoStock from '../componentes/EstadoStock.jsx';
 import ResumenInventario from '../componentes/ResumenInventario.jsx';
-import FiltrosInventario from '../componentes/FiltrosInventario.jsx';
-import TablaInventario from '../componentes/TablaInventario.jsx';
-import BotonRestablecer from '../componentes/BotonRestablecer.jsx';
+import { useInventario } from '../contexto/InventarioContext.js';
 import { useTituloPagina } from '../hooks/useTituloPagina.js';
-import { STOCK_MAXIMO } from '../hooks/useInventario.js';
-import { CATEGORIAS } from '../datos/productos.js';
-import { ESTADOS, filtrarProductos, resumirInventario } from '../utilidades/inventario.js';
-import { contarUnidades } from '../utilidades/formato.js';
+import { BOTON_PRINCIPAL, BOTON_SECUNDARIO, ENLACE_SIMPLE, INTRODUCCION, SUBTITULO, TITULO_PAGINA } from '../utilidades/estilos.js';
+import { formatearNumero } from '../utilidades/formato.js';
+import { listarPorReponer, resumirInventario } from '../utilidades/inventario.js';
 
 function Inicio() {
-    useTituloPagina('Inventario');
-    // El inventario llega desde la Plantilla, a través del <Outlet context>.
-    const { productos, ajustarStock, restablecer, modificado } = useOutletContext();
-    const [parametros, setParametros] = useSearchParams();
-    const [mensaje, setMensaje] = useState(''); // Último ajuste, para el lector de pantalla
-    const tituloProductos = useRef(null);
+    useTituloPagina('Inicio');
+    const { articulos } = useInventario();
 
-    // Filtros leídos de la URL. Un valor desconocido (?categoria=xyz) se ignora.
-    const busqueda = parametros.get('q') ?? '';
-    const categoria = valorConocido(parametros.get('categoria'), CATEGORIAS);
-    const estado = valorConocido(parametros.get('estado'), ESTADOS);
-    const hayFiltros = busqueda !== '' || categoria !== '' || estado !== '';
-
-    // Datos derivados: se recalculan solo cuando cambia lo que usan.
-    const resumen = useMemo(() => resumirInventario(productos), [productos]);
-    const visibles = useMemo(
-        () => filtrarProductos(productos, { busqueda, categoria, estado }),
-        [productos, busqueda, categoria, estado],
-    );
-
-    // Cambia un filtro en la URL. Escribir en el buscador reemplaza la entrada del
-    // historial (replace) para no crear una por cada letra; elegir una categoría o un
-    // estado sí crea una, así Atrás vuelve al filtro anterior.
-    function cambiarFiltro(nombre, valor, { reemplazar = false } = {}) {
-        setParametros((actuales) => {
-            const nuevos = new URLSearchParams(actuales);
-            if (valor === '') nuevos.delete(nombre);
-            else nuevos.set(nombre, valor);
-            return nuevos;
-        }, { replace: reemplazar });
-    }
-
-    function limpiarFiltros() {
-        setParametros({});
-    }
-
-    // Ajuste rápido desde la tabla (+1 o −1), anunciado al lector de pantalla.
-    function ajustar(producto, cambio) {
-        const nuevo = Math.min(STOCK_MAXIMO, Math.max(0, producto.stock + cambio));
-        if (nuevo === producto.stock) return;
-        ajustarStock(producto.id, cambio);
-        setMensaje(producto.nombre + ': ' + contarUnidades(nuevo) + '.');
-    }
-
-    // Al restablecer, el botón desaparece: el foco pasa al título de la tabla para no perderse.
-    function restablecerStock() {
-        restablecer();
-        setMensaje('Se restableció el stock de los datos de ejemplo.');
-        tituloProductos.current?.focus();
-    }
-
-    const textoConteo = visibles.length === productos.length
-        ? productos.length + ' productos'
-        : visibles.length + ' de ' + productos.length + ' productos';
+    // Datos derivados: se recalculan solo cuando cambia la lista de artículos.
+    const resumen = useMemo(() => resumirInventario(articulos), [articulos]);
+    const porReponer = useMemo(() => listarPorReponer(articulos), [articulos]);
 
     return (
         <>
-            <div className="encabezado-pagina">
-                <h1>Inventario</h1>
-                <p className="text-secondary mb-0">
-                    Stock de la sucursal Concepción Centro. Elige un producto para ver su detalle y
-                    registrar entradas o salidas.
+            <div className="mb-6">
+                <h1 className={TITULO_PAGINA}>Inventario de la sucursal</h1>
+                <p className={INTRODUCCION}>
+                    Estado del stock de Despensa Austral Concepción Centro. Elige una cifra para ver esos artículos.
                 </p>
             </div>
 
-            <ResumenInventario
-                resumen={resumen}
-                estado={estado}
-                onElegirEstado={(valor) => cambiarFiltro('estado', valor)}
-            />
+            <ResumenInventario resumen={resumen} />
 
-            <section className="mt-4" aria-labelledby="titulo-productos">
-                <div className="d-flex flex-wrap justify-content-between align-items-baseline gap-2 mb-3">
-                    <h2 id="titulo-productos" className="h5 mb-0" ref={tituloProductos} tabIndex={-1}>Productos</h2>
-                    <p className="small text-secondary mb-0" aria-live="polite">{textoConteo}</p>
-                </div>
-                <FiltrosInventario
-                    busqueda={busqueda}
-                    categoria={categoria}
-                    estado={estado}
-                    hayFiltros={hayFiltros}
-                    onCambiar={cambiarFiltro}
-                    onLimpiar={limpiarFiltros}
-                />
-                <TablaInventario productos={visibles} onAjustar={ajustar} onLimpiar={limpiarFiltros} />
+            <div className="mt-4 flex flex-wrap gap-2">
+                <Link to="/articulos" className={BOTON_PRINCIPAL}>Ver todos los artículos</Link>
+                <Link to="/ingresar-articulo" className={BOTON_SECUNDARIO}>Ingresar artículo</Link>
+            </div>
+
+            <section className="mt-8" aria-labelledby="titulo-reponer">
+                <h2 id="titulo-reponer" className={SUBTITULO + ' mb-3'}>Por reponer</h2>
+                {/* Renderizado condicional: sin artículos por reponer, la lista da paso a un aviso */}
+                {porReponer.length === 0 ? (
+                    <p className="text-suave">Todos los artículos están sobre su stock mínimo.</p>
+                ) : (
+                    <ul className="divide-y divide-borde rounded-lg border border-borde bg-blanco">
+                        {porReponer.map((articulo) => (
+                            <li key={articulo.id} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-3">
+                                <div>
+                                    <Link to={'/articulo/' + articulo.id} className={ENLACE_SIMPLE + ' font-semibold'}>
+                                        {articulo.nombre}
+                                    </Link>
+                                    <span className="block text-sm text-suave">{articulo.marca} · {articulo.formato}</span>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <span className="text-sm text-suave tabular-nums">
+                                        {formatearNumero(articulo.stock)} de {formatearNumero(articulo.stockMinimo)} mínimas
+                                    </span>
+                                    <EstadoStock articulo={articulo} />
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                )}
             </section>
-
-            <p className="visually-hidden" aria-live="polite">{mensaje}</p>
-
-            {/* Renderizado condicional: solo aparece si el stock cambió respecto de los datos de ejemplo */}
-            {modificado && <BotonRestablecer onRestablecer={restablecerStock} />}
         </>
     );
-}
-
-// Devuelve el valor si está en la lista ({ id }) y '' si no.
-function valorConocido(valor, lista) {
-    return lista.some((item) => item.id === valor) ? valor : '';
 }
 
 export default Inicio;

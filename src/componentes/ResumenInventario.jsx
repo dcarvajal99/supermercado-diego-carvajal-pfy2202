@@ -1,37 +1,33 @@
-// Resumen del inventario en cuatro cifras. Las tres primeras también son filtros: al
-// pulsarlas, la tabla muestra solo esos productos y la cifra queda marcada
-// (aria-pressed). Pulsar de nuevo la cifra marcada vuelve a mostrar todo.
+// Resumen del inventario en cuatro cifras. Las tres primeras son enlaces a la lista de
+// artículos con el filtro ya aplicado en la URL (/articulos?estado=bajo).
+import { Link } from 'react-router-dom';
 import { contarUnidades, formatearNumero, formatearPesos } from '../utilidades/formato.js';
 
-function ResumenInventario({ resumen, estado, onElegirEstado }) {
+const CIFRA = 'flex flex-col gap-0.5 rounded-lg border border-borde bg-blanco px-[1.125rem] py-4';
+const TITULO = 'text-[0.8125rem] font-medium text-suave';
+const VALOR = 'text-xl font-semibold tabular-nums sm:text-2xl';
+const DETALLE = 'text-[0.8125rem] text-suave';
+
+function ResumenInventario({ resumen }) {
     const cifras = [
-        { estado: '', titulo: 'Productos', valor: resumen.total, detalle: contarUnidades(resumen.unidades) + ' en total' },
-        { estado: 'bajo', titulo: 'Stock bajo', valor: resumen.bajo, detalle: 'En el mínimo o por debajo' },
-        { estado: 'agotado', titulo: 'Sin stock', valor: resumen.agotado, detalle: 'Reponer cuanto antes' },
+        { ruta: '/articulos', titulo: 'Artículos', valor: resumen.total, detalle: contarUnidades(resumen.unidades) + ' en total' },
+        { ruta: '/articulos?estado=bajo', titulo: 'Stock bajo', valor: resumen.bajo, detalle: 'En el mínimo o por debajo' },
+        { ruta: '/articulos?estado=agotado', titulo: 'Sin stock', valor: resumen.agotado, detalle: 'Reponer cuanto antes', alerta: resumen.agotado > 0 },
     ];
 
     return (
-        <section className="resumen" aria-label="Resumen del inventario">
-            {cifras.map((cifra) => {
-                const elegida = estado === cifra.estado;
-                return (
-                    <button
-                        key={cifra.titulo}
-                        type="button"
-                        className={'cifra cifra-boton' + (cifra.estado === 'agotado' && cifra.valor > 0 ? ' cifra-alerta' : '')}
-                        aria-pressed={elegida}
-                        onClick={() => onElegirEstado(elegida ? '' : cifra.estado)}
-                    >
-                        <span className="cifra-titulo">{cifra.titulo}</span>
-                        <span className="cifra-valor">{formatearNumero(cifra.valor)}</span>
-                        <span className="cifra-detalle">{cifra.detalle}</span>
-                    </button>
-                );
-            })}
-            <div className="cifra">
-                <span className="cifra-titulo">Valor del inventario</span>
-                <span className="cifra-valor">{formatearPesos(resumen.valor)}</span>
-                <span className="cifra-detalle">A precio de venta</span>
+        <section className="grid grid-cols-2 gap-3 md:grid-cols-4" aria-label="Resumen del inventario">
+            {cifras.map((cifra) => (
+                <Link key={cifra.titulo} to={cifra.ruta} className={CIFRA + ' text-tinta hover:border-suave'}>
+                    <span className={TITULO}>{cifra.titulo}</span>
+                    <span className={cifra.alerta ? VALOR + ' text-alerta' : VALOR}>{formatearNumero(cifra.valor)}</span>
+                    <span className={DETALLE}>{cifra.detalle}</span>
+                </Link>
+            ))}
+            <div className={CIFRA}>
+                <span className={TITULO}>Valor del inventario</span>
+                <span className={VALOR}>{formatearPesos(resumen.valor)}</span>
+                <span className={DETALLE}>A precio de venta</span>
             </div>
         </section>
     );

@@ -2,16 +2,24 @@ import { copyFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import { PRODUCTOS } from './src/datos/productos.js';
+import tailwindcss from '@tailwindcss/vite';
+import { ARTICULOS_INICIALES } from './src/datos/articulos.js';
 
 // Rutas del sitio (las mismas de App.jsx), sin la barra inicial.
-const RUTAS = ['quienes-somos', 'nuestras-tiendas', ...PRODUCTOS.map((producto) => 'producto/' + producto.id)];
+const RUTAS = [
+    'articulos',
+    'ingresar-articulo',
+    'quienes-somos',
+    'nuestras-tiendas',
+    ...ARTICULOS_INICIALES.map((articulo) => 'articulo/' + articulo.id),
+];
 
 // GitHub Pages no conoce las rutas de React Router: al recargar /quienes-somos busca
 // un archivo con ese nombre. Para cada ruta se copia index.html como <ruta>.html, que
 // Pages sirve con estado 200, y BrowserRouter dibuja la página que corresponde a la URL.
-// La copia 404.html atiende las direcciones que no existen: responde con estado 404,
-// carga la misma aplicación y React Router muestra la página «no encontrada».
+// La copia 404.html atiende todo lo demás: las direcciones que no existen y los artículos
+// ingresados por la persona, que solo viven en su navegador. Responde con estado 404,
+// pero carga la misma aplicación y React Router muestra lo que corresponda.
 function copiarRutas() {
     return {
         name: 'copiar-rutas',
@@ -32,5 +40,5 @@ function copiarRutas() {
 // y main.jsx usa la misma base para las rutas de React Router.
 export default defineConfig({
     base: '/supermercado-diego-carvajal-pfy2202/',
-    plugins: [react(), copiarRutas()],
+    plugins: [react(), tailwindcss(), copiarRutas()],
 });

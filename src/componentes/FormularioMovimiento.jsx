@@ -1,11 +1,15 @@
 // Formulario para registrar una entrada (llegó mercadería) o una salida (venta o
-// merma) de un producto. Valida la cantidad antes de tocar el stock y confirma el
+// merma) de un artículo. Valida la cantidad antes de tocar el stock y confirma el
 // resultado en un mensaje que también anuncia el lector de pantalla.
 import { useRef, useState } from 'react';
-import { STOCK_MAXIMO } from '../hooks/useInventario.js';
+import { BOTON_PRINCIPAL, CAMPO, ERROR, ETIQUETA } from '../utilidades/estilos.js';
 import { contarUnidades, formatearNumero } from '../utilidades/formato.js';
+import { STOCK_MAXIMO } from '../utilidades/inventario.js';
 
-function FormularioMovimiento({ producto, onRegistrar }) {
+// has-checked: la etiqueta se rellena según el estado del radio escondido en su interior.
+const OPCION = 'block cursor-pointer px-4 py-2 text-center has-checked:bg-tinta has-checked:text-blanco has-focus-visible:outline-2 has-focus-visible:-outline-offset-4 has-focus-visible:outline-acento';
+
+function FormularioMovimiento({ articulo, onRegistrar }) {
     const [tipo, setTipo] = useState('entrada'); // 'entrada' o 'salida'
     const [cantidad, setCantidad] = useState('');
     const [error, setError] = useState('');
@@ -16,10 +20,10 @@ function FormularioMovimiento({ producto, onRegistrar }) {
         const numero = Number(cantidad);
         if (cantidad.trim() === '') return 'Ingresa la cantidad de unidades.';
         if (!Number.isInteger(numero) || numero < 1) return 'La cantidad debe ser un número entero mayor que 0.';
-        if (tipo === 'salida' && numero > producto.stock) {
-            return 'Hay ' + contarUnidades(producto.stock) + ' en stock: la salida no puede ser mayor.';
+        if (tipo === 'salida' && numero > articulo.stock) {
+            return 'Hay ' + contarUnidades(articulo.stock) + ' en stock: la salida no puede ser mayor.';
         }
-        if (tipo === 'entrada' && producto.stock + numero > STOCK_MAXIMO) {
+        if (tipo === 'entrada' && articulo.stock + numero > STOCK_MAXIMO) {
             return 'El stock no puede superar las ' + formatearNumero(STOCK_MAXIMO) + ' unidades.';
         }
         return '';
@@ -38,7 +42,7 @@ function FormularioMovimiento({ producto, onRegistrar }) {
         onRegistrar(cambio);
         setConfirmacion(
             (tipo === 'entrada' ? 'Entrada' : 'Salida') + ' de ' + contarUnidades(Math.abs(cambio))
-            + ' registrada. Stock actual: ' + contarUnidades(producto.stock + cambio) + '.',
+            + ' registrada. Stock actual: ' + contarUnidades(articulo.stock + cambio) + '.',
         );
         setCantidad('');
     }
@@ -51,31 +55,33 @@ function FormularioMovimiento({ producto, onRegistrar }) {
     return (
         <form noValidate onSubmit={registrar}>
             <fieldset className="mb-3">
-                <legend className="form-label small mb-2">Tipo de movimiento</legend>
-                <div className="btn-group w-100">
-                    <input
-                        type="radio"
-                        className="btn-check"
-                        name="tipo"
-                        id="tipo-entrada"
-                        checked={tipo === 'entrada'}
-                        onChange={() => elegirTipo('entrada')}
-                    />
-                    <label className="btn btn-outline-dark" htmlFor="tipo-entrada">Entrada</label>
-                    <input
-                        type="radio"
-                        className="btn-check"
-                        name="tipo"
-                        id="tipo-salida"
-                        checked={tipo === 'salida'}
-                        onChange={() => elegirTipo('salida')}
-                    />
-                    <label className="btn btn-outline-dark" htmlFor="tipo-salida">Salida</label>
+                <legend className={ETIQUETA}>Tipo de movimiento</legend>
+                <div className="grid grid-cols-2 overflow-hidden rounded-md border border-tinta">
+                    <label className={OPCION}>
+                        <input
+                            type="radio"
+                            className="sr-only"
+                            name="tipo"
+                            checked={tipo === 'entrada'}
+                            onChange={() => elegirTipo('entrada')}
+                        />
+                        Entrada
+                    </label>
+                    <label className={OPCION}>
+                        <input
+                            type="radio"
+                            className="sr-only"
+                            name="tipo"
+                            checked={tipo === 'salida'}
+                            onChange={() => elegirTipo('salida')}
+                        />
+                        Salida
+                    </label>
                 </div>
             </fieldset>
 
             <div className="mb-3">
-                <label htmlFor="cantidad" className="form-label small">Cantidad de unidades</label>
+                <label htmlFor="cantidad" className={ETIQUETA}>Cantidad de unidades</label>
                 <input
                     ref={campoCantidad}
                     id="cantidad"
@@ -83,20 +89,20 @@ function FormularioMovimiento({ producto, onRegistrar }) {
                     inputMode="numeric"
                     min="1"
                     step="1"
-                    className={error ? 'form-control is-invalid' : 'form-control'}
+                    className={CAMPO}
                     value={cantidad}
                     aria-invalid={error ? true : undefined}
                     aria-describedby={error ? 'error-cantidad' : undefined}
                     onChange={(evento) => setCantidad(evento.target.value)}
                 />
-                {error && <div id="error-cantidad" className="invalid-feedback">{error}</div>}
+                {error && <p id="error-cantidad" className={ERROR}>{error}</p>}
             </div>
 
-            <button type="submit" className="btn btn-dark w-100">
+            <button type="submit" className={BOTON_PRINCIPAL + ' w-full'}>
                 {tipo === 'entrada' ? 'Registrar entrada' : 'Registrar salida'}
             </button>
             {/* La región existe siempre, así el lector de pantalla anuncia cada confirmación nueva */}
-            <p className="confirmacion small mt-3 mb-0" role="status">{confirmacion}</p>
+            <p className="mt-3 border-l-2 border-acento bg-lienzo px-3 py-2 text-sm empty:hidden" role="status">{confirmacion}</p>
         </form>
     );
 }

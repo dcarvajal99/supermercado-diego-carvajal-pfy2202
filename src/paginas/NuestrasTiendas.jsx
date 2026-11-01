@@ -1,10 +1,11 @@
 // Página «Nuestras tiendas»: las sucursales con dirección, horario y servicios.
-// El filtro por región vive en la URL (?region=biobio), igual que los filtros del
-// inventario: se puede compartir el enlace a las tiendas de una sola región.
+// El filtro por región vive en la URL (?region=biobio), igual que los filtros de la
+// lista de artículos: se puede compartir el enlace a las tiendas de una sola región.
 import { useSearchParams } from 'react-router-dom';
 import TarjetaTienda from '../componentes/TarjetaTienda.jsx';
 import { useTituloPagina } from '../hooks/useTituloPagina.js';
 import { REGIONES, TIENDAS } from '../datos/tiendas.js';
+import { BOTON_CHICO, BOTON_CHICO_ACTIVO, INTRODUCCION, TITULO_PAGINA } from '../utilidades/estilos.js';
 
 function NuestrasTiendas() {
     useTituloPagina('Nuestras tiendas');
@@ -23,20 +24,20 @@ function NuestrasTiendas() {
 
     return (
         <>
-            <div className="encabezado-pagina">
-                <h1>Nuestras tiendas</h1>
-                <p className="lead mb-0">
+            <div className="mb-6">
+                <h1 className={TITULO_PAGINA}>Nuestras tiendas</h1>
+                <p className={INTRODUCCION + ' text-[1.0625rem]'}>
                     {TIENDAS.length} sucursales entre el Biobío y La Araucanía, abiertas todos los días.
                 </p>
             </div>
 
-            <div className="d-flex flex-wrap align-items-center gap-2 mb-3" role="group" aria-label="Filtrar por región">
-                <span className="small text-secondary me-1">Región:</span>
+            <div className="mb-3 flex flex-wrap items-center gap-2" role="group" aria-label="Filtrar por región">
+                <span className="mr-1 text-sm text-suave">Región:</span>
                 {opciones.map((opcion) => (
                     <button
                         key={opcion.id}
                         type="button"
-                        className={region === opcion.id ? 'btn btn-dark btn-sm' : 'btn btn-outline-dark btn-sm'}
+                        className={region === opcion.id ? BOTON_CHICO_ACTIVO : BOTON_CHICO}
                         aria-pressed={region === opcion.id}
                         onClick={() => elegirRegion(opcion.id)}
                     >
@@ -45,11 +46,11 @@ function NuestrasTiendas() {
                 ))}
             </div>
 
-            <p className="small text-secondary" aria-live="polite">
+            <p className="mb-4 text-sm text-suave" aria-live="polite">
                 {visibles.length === 1 ? '1 tienda' : visibles.length + ' tiendas'}
             </p>
 
-            <ul className="tiendas">
+            <ul className="grid grid-cols-[repeat(auto-fill,minmax(17rem,1fr))] gap-4">
                 {visibles.map((tienda) => (
                     <li key={tienda.id}>
                         <TarjetaTienda tienda={tienda} />

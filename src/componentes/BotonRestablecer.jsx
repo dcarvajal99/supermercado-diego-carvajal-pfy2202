@@ -1,6 +1,7 @@
-// Vuelve el stock a los datos de ejemplo. Pide confirmación antes, porque borra todos
-// los ajustes guardados en el navegador.
+// Vuelve el inventario a los datos de ejemplo. Pide confirmación antes, porque borra los
+// artículos ingresados y los ajustes de stock guardados en el navegador.
 import { useRef, useState } from 'react';
+import { BOTON_CHICO, BOTON_CHICO_ACTIVO } from '../utilidades/estilos.js';
 
 function BotonRestablecer({ onRestablecer }) {
     const [preguntando, setPreguntando] = useState(false);
@@ -13,22 +14,22 @@ function BotonRestablecer({ onRestablecer }) {
     }
 
     return (
-        <div className="restablecer">
-            <p className="small text-secondary mb-2">
-                Los ajustes de stock se guardan en este navegador.
+        <div className="mt-6 border-t border-borde pt-4">
+            <p className="mb-2 text-sm text-suave">
+                Los artículos ingresados y los ajustes de stock se guardan en este navegador.
             </p>
             {preguntando ? (
-                <div className="d-flex flex-wrap align-items-center gap-2" role="group" aria-label="Confirmar restablecer">
-                    <span className="small">¿Volver al stock de los datos de ejemplo?</span>
-                    <button type="button" className="btn btn-dark btn-sm" onClick={onRestablecer} autoFocus>
+                <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Confirmar restablecer">
+                    <span className="text-sm">¿Volver a los datos de ejemplo?</span>
+                    <button type="button" className={BOTON_CHICO_ACTIVO} onClick={onRestablecer} autoFocus>
                         Sí, restablecer
                     </button>
-                    <button type="button" className="btn btn-outline-dark btn-sm" onClick={cancelar}>
+                    <button type="button" className={BOTON_CHICO} onClick={cancelar}>
                         Cancelar
                     </button>
                 </div>
             ) : (
-                <button ref={botonInicial} type="button" className="btn btn-outline-dark btn-sm" onClick={() => setPreguntando(true)}>
+                <button ref={botonInicial} type="button" className={BOTON_CHICO} onClick={() => setPreguntando(true)}>
                     Restablecer datos de ejemplo
                 </button>
             )}

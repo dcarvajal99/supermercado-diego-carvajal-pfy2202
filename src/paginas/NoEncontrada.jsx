@@ -2,6 +2,7 @@
 // useNavigate permite navegar desde el código: aquí, volver a la página anterior.
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTituloPagina } from '../hooks/useTituloPagina.js';
+import { BOTON_PRINCIPAL, BOTON_SECUNDARIO, TITULO_PAGINA } from '../utilidades/estilos.js';
 
 function NoEncontrada() {
     useTituloPagina('Página no encontrada');
@@ -13,21 +14,21 @@ function NoEncontrada() {
     const hayAnterior = key !== 'default';
 
     return (
-        <div className="encabezado-pagina">
-            <h1>Página no encontrada</h1>
-            <p>
-                La dirección <code>{pathname}</code> no existe en el sitio. Puede que el enlace esté mal
-                escrito o que la página se haya movido.
+        <>
+            <h1 className={TITULO_PAGINA}>Página no encontrada</h1>
+            <p className="mt-2 mb-4">
+                La dirección <code className="rounded bg-borde px-1 py-0.5 text-sm">{pathname}</code> no existe
+                en el sitio. Puede que el enlace esté mal escrito o que la página se haya movido.
             </p>
-            <div className="d-flex flex-wrap gap-2">
-                <Link to="/" className="btn btn-dark">Ir al inventario</Link>
+            <div className="flex flex-wrap gap-2">
+                <Link to="/" className={BOTON_PRINCIPAL}>Ir al inicio</Link>
                 {hayAnterior && (
-                    <button type="button" className="btn btn-outline-dark" onClick={() => navegar(-1)}>
+                    <button type="button" className={BOTON_SECUNDARIO} onClick={() => navegar(-1)}>
                         Volver a la página anterior
                     </button>
                 )}
             </div>
-        </div>
+        </>
     );
 }
 
