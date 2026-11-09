@@ -1,6 +1,6 @@
 // Página «Quiénes somos»: historia, misión, visión, valores y cifras del supermercado.
 // Es contenido fijo; las listas se dibujan con map() para no repetir marcado.
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { useTituloPagina } from '../hooks/useTituloPagina.js';
 import { TIENDAS } from '../datos/tiendas.js';
 import { ENLACE, INTRODUCCION, PANEL, SUBTITULO, TITULO_PAGINA } from '../utilidades/estilos.js';

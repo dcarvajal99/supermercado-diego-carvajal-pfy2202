@@ -4,7 +4,7 @@ import { createContext, useContext } from 'react';
 
 export const InventarioContext = createContext(null);
 
-// Hook para leer el estado global: const { articulos, agregarArticulo } = useInventario();
+// Hook para leer el estado global: const { articulos, carrito, agregarAlCarrito } = useInventario();
 export function useInventario() {
     const contexto = useContext(InventarioContext);
     if (contexto === null) {

@@ -2,9 +2,12 @@
 // merma) de un artículo. Valida la cantidad antes de tocar el stock y confirma el
 // resultado en un mensaje que también anuncia el lector de pantalla.
 import { useRef, useState } from 'react';
-import { BOTON_PRINCIPAL, CAMPO, ERROR, ETIQUETA } from '../utilidades/estilos.js';
+import Aviso from './Aviso.jsx';
+import Boton from './Boton.jsx';
+import { CAMPO, ERROR, ETIQUETA } from '../utilidades/estilos.js';
 import { contarUnidades, formatearNumero } from '../utilidades/formato.js';
-import { STOCK_MAXIMO } from '../utilidades/inventario.js';
+import { PATRONES } from '../utilidades/validaciones.js';
+import { STOCK_MAXIMO, cambioPermitido } from '../utilidades/inventario.js';
 
 // has-checked: la etiqueta se rellena según el estado del radio escondido en su interior.
 const OPCION = 'block cursor-pointer px-4 py-2 text-center has-checked:bg-tinta has-checked:text-blanco has-focus-visible:outline-2 has-focus-visible:-outline-offset-4 has-focus-visible:outline-acento';
@@ -16,17 +19,16 @@ function FormularioMovimiento({ articulo, onRegistrar }) {
     const [confirmacion, setConfirmacion] = useState('');
     const campoCantidad = useRef(null);
 
+    // Los límites del stock se revisan con cambioPermitido(), la misma regla que usa el reductor.
     function validar() {
-        const numero = Number(cantidad);
-        if (cantidad.trim() === '') return 'Ingresa la cantidad de unidades.';
-        if (!Number.isInteger(numero) || numero < 1) return 'La cantidad debe ser un número entero mayor que 0.';
-        if (tipo === 'salida' && numero > articulo.stock) {
-            return 'Hay ' + contarUnidades(articulo.stock) + ' en stock: la salida no puede ser mayor.';
-        }
-        if (tipo === 'entrada' && articulo.stock + numero > STOCK_MAXIMO) {
-            return 'El stock no puede superar las ' + formatearNumero(STOCK_MAXIMO) + ' unidades.';
-        }
-        return '';
+        const valor = cantidad.trim();
+        if (valor === '') return 'Ingresa la cantidad de unidades.';
+        if (!PATRONES.entero.test(valor) || Number(valor) < 1) return 'La cantidad debe ser un número entero mayor que 0.';
+        const cambio = tipo === 'entrada' ? Number(valor) : -Number(valor);
+        if (cambioPermitido(articulo.stock, cambio)) return '';
+        return tipo === 'salida'
+            ? 'Hay ' + contarUnidades(articulo.stock) + ' en stock: la salida no puede ser mayor.'
+            : 'El stock no puede superar las ' + formatearNumero(STOCK_MAXIMO) + ' unidades.';
     }
 
     function registrar(evento) {
@@ -98,11 +100,10 @@ function FormularioMovimiento({ articulo, onRegistrar }) {
                 {error && <p id="error-cantidad" className={ERROR}>{error}</p>}
             </div>
 
-            <button type="submit" className={BOTON_PRINCIPAL + ' w-full'}>
+            <Boton type="submit" className="w-full">
                 {tipo === 'entrada' ? 'Registrar entrada' : 'Registrar salida'}
-            </button>
-            {/* La región existe siempre, así el lector de pantalla anuncia cada confirmación nueva */}
-            <p className="mt-3 border-l-2 border-acento bg-lienzo px-3 py-2 text-sm empty:hidden" role="status">{confirmacion}</p>
+            </Boton>
+            <Aviso enPanel className="mt-3">{confirmacion}</Aviso>
         </form>
     );
 }

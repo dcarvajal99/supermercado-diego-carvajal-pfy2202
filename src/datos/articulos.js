@@ -2,8 +2,9 @@
 // estado global: los artículos nuevos y los ajustes de stock se guardan en localStorage
 // (ver contexto/InventarioProvider.jsx). Las marcas son ficticias.
 
-// El id de cada tipo es el que viaja en la URL (/articulos?tipo=lacteos) y el prefijo
-// forma el SKU de los artículos nuevos (LAC-004).
+// Categorías de los artículos. El campo `tipo` de cada artículo guarda una de ellas (el
+// tipo de producto). Su id es el que viaja en la URL (/articulos?categoria=lacteos) y el
+// prefijo forma el SKU de los artículos nuevos (LAC-004).
 export const TIPOS_PRODUCTO = [
     { id: 'abarrotes', nombre: 'Abarrotes', prefijo: 'ABA' },
     { id: 'lacteos', nombre: 'Lácteos', prefijo: 'LAC' },

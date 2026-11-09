@@ -1,32 +1,21 @@
-// Componente raíz: declara las rutas del sitio. Todas las páginas comparten la
-// Plantilla (cabecera con el menú de artículos, contenido y menú inferior); React Router
-// elige qué página dibujar dentro de ella según la URL, sin recargar el navegador.
-import { Routes, Route } from 'react-router-dom';
-import Plantilla from './componentes/Plantilla.jsx';
-import Inicio from './paginas/Inicio.jsx';
-import ListaArticulos from './paginas/ListaArticulos.jsx';
-import IngresarArticulo from './paginas/IngresarArticulo.jsx';
-import DetalleArticulo from './paginas/DetalleArticulo.jsx';
-import QuienesSomos from './paginas/QuienesSomos.jsx';
-import NuestrasTiendas from './paginas/NuestrasTiendas.jsx';
-import NoEncontrada from './paginas/NoEncontrada.jsx';
+// Componente raíz: arma los proveedores que necesita todo el sitio y deja las rutas a
+// AppRoutes. BrowserRouter permite a cualquier componente leer la URL y navegar, e
+// InventarioProvider le entrega el estado global. Como envuelven a las rutas, no se
+// desmontan al cambiar de página.
+import { BrowserRouter } from 'react-router';
+import InventarioProvider from './contexto/InventarioProvider.jsx';
+import AppRoutes from './rutas/AppRoutes.jsx';
 
 function App() {
+    // En GitHub Pages el sitio vive en /supermercado-diego-carvajal-pfy2202/. basename le
+    // indica a React Router que las rutas empiezan después de esa carpeta, con la misma
+    // base que usa Vite (vite.config.js).
     return (
-        <Routes>
-            {/* Ruta de diseño: no agrega nada a la URL, solo envuelve a sus hijas */}
-            <Route element={<Plantilla />}>
-                <Route index element={<Inicio />} />
-                <Route path="articulos" element={<ListaArticulos />} />
-                <Route path="ingresar-articulo" element={<IngresarArticulo />} />
-                {/* Ruta dinámica: :id toma el identificador del artículo desde la URL */}
-                <Route path="articulo/:id" element={<DetalleArticulo />} />
-                <Route path="quienes-somos" element={<QuienesSomos />} />
-                <Route path="nuestras-tiendas" element={<NuestrasTiendas />} />
-                {/* Cualquier otra dirección. Va al final para que primero se prueben las anteriores */}
-                <Route path="*" element={<NoEncontrada />} />
-            </Route>
-        </Routes>
+        <BrowserRouter basename={import.meta.env.BASE_URL}>
+            <InventarioProvider>
+                <AppRoutes />
+            </InventarioProvider>
+        </BrowserRouter>
     );
 }
 

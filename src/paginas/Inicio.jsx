@@ -1,12 +1,13 @@
 // Home del sitio: el panel del inventario. Resume el estado global en cuatro cifras y
 // muestra los artículos que hay que reponer; la tabla completa está en /articulos.
 import { useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
+import Boton from '../componentes/Boton.jsx';
 import EstadoStock from '../componentes/EstadoStock.jsx';
 import ResumenInventario from '../componentes/ResumenInventario.jsx';
 import { useInventario } from '../contexto/InventarioContext.js';
 import { useTituloPagina } from '../hooks/useTituloPagina.js';
-import { BOTON_PRINCIPAL, BOTON_SECUNDARIO, ENLACE_SIMPLE, INTRODUCCION, SUBTITULO, TITULO_PAGINA } from '../utilidades/estilos.js';
+import { ENLACE_SIMPLE, INTRODUCCION, SUBTITULO, TITULO_PAGINA } from '../utilidades/estilos.js';
 import { formatearNumero } from '../utilidades/formato.js';
 import { listarPorReponer, resumirInventario } from '../utilidades/inventario.js';
 
@@ -30,8 +31,8 @@ function Inicio() {
             <ResumenInventario resumen={resumen} />
 
             <div className="mt-4 flex flex-wrap gap-2">
-                <Link to="/articulos" className={BOTON_PRINCIPAL}>Ver todos los artículos</Link>
-                <Link to="/ingresar-articulo" className={BOTON_SECUNDARIO}>Ingresar artículo</Link>
+                <Boton ruta="/articulos" variante="principal">Ver todos los artículos</Boton>
+                <Boton ruta="/ingresar-articulo">Ingresar artículo</Boton>
             </div>
 
             <section className="mt-8" aria-labelledby="titulo-reponer">

@@ -1,68 +1,43 @@
-// Proveedor del estado global: guarda la lista de artículos con useReducer y la entrega a
-// toda la aplicación por contexto. Envuelve al sitio en main.jsx, así el estado sobrevive
-// al cambio de página, y lo guarda en localStorage para conservarlo al recargar.
-import { useEffect, useMemo, useReducer } from 'react';
+// Proveedor del estado global: une las piezas y entrega el resultado por contexto.
+//   - inventarioReducer.js: las transiciones del estado (funciones puras).
+//   - acciones.js: los objetos de acción que se despachan.
+//   - persistencia.js y hooks/usePersistencia.js: lectura y guardado en localStorage.
+// Envuelve al sitio en App.jsx, así el estado sobrevive al cambio de página.
+import { useMemo, useReducer } from 'react';
+import { acciones } from './acciones.js';
 import { InventarioContext } from './InventarioContext.js';
-import { inventarioReducer } from './inventarioReducer.js';
-import { ARTICULOS_INICIALES } from '../datos/articulos.js';
-import { crearArticulo, STOCK_MAXIMO } from '../utilidades/inventario.js';
-
-const CLAVE = 'despensa-austral-articulos';
+import { ESTADO_INICIAL, inventarioReducer } from './inventarioReducer.js';
+import { leerEstadoGuardado } from './persistencia.js';
+import { usePersistencia } from '../hooks/usePersistencia.js';
+import { contarUnidadesCarrito } from '../utilidades/carrito.js';
 
 function InventarioProvider({ children }) {
     // Tercer argumento: el estado inicial se lee de localStorage una sola vez.
-    const [articulos, despachar] = useReducer(inventarioReducer, ARTICULOS_INICIALES, leerGuardado);
+    const [estado, despachar] = useReducer(inventarioReducer, ESTADO_INICIAL, leerEstadoGuardado);
+    usePersistencia(estado);
 
-    // Efecto secundario: cada vez que cambia la lista, se guarda.
-    useEffect(() => {
-        try {
-            localStorage.setItem(CLAVE, JSON.stringify(articulos));
-        } catch {
-            // Navegación privada o almacenamiento lleno: el sitio sigue funcionando sin guardar.
-        }
-    }, [articulos]);
+    // Las funciones que despachan acciones no cambian nunca: se crean una sola vez.
+    const operaciones = useMemo(() => ({
+        agregarArticulo: (articulo) => despachar(acciones.agregarArticulo(articulo)),
+        ajustarStock: (id, cambio) => despachar(acciones.ajustarStock(id, cambio)),
+        agregarAlCarrito: (id, cantidad) => despachar(acciones.moverAlCarrito(id, cantidad)),
+        cambiarCantidad: (id, cambio) => despachar(acciones.moverAlCarrito(id, cambio)),
+        quitarDelCarrito: (id) => despachar(acciones.quitarDelCarrito(id)),
+        vaciarCarrito: () => despachar(acciones.vaciarCarrito()),
+        finalizarCompra: () => despachar(acciones.finalizarCompra()),
+        restablecer: () => despachar(acciones.restablecer()),
+    }), []);
 
-    // useMemo evita volver a dibujar a quienes leen el contexto si la lista no cambió.
-    const valor = useMemo(() => {
-        // Devuelve el artículo creado para que el formulario conozca su id.
-        function agregarArticulo(datos) {
-            const articulo = crearArticulo(datos, articulos);
-            despachar({ type: 'agregar', articulo });
-            return articulo;
-        }
-
-        function ajustarStock(id, cambio) {
-            despachar({ type: 'ajustar-stock', id, cambio });
-        }
-
-        function restablecer() {
-            despachar({ type: 'restablecer' });
-        }
-
-        const modificado = JSON.stringify(articulos) !== JSON.stringify(ARTICULOS_INICIALES);
-        return { articulos, modificado, agregarArticulo, ajustarStock, restablecer };
-    }, [articulos]);
+    // useMemo evita volver a dibujar a quienes leen el contexto si el estado no cambió.
+    const valor = useMemo(() => ({
+        articulos: estado.articulos,
+        carrito: estado.carrito,
+        modificado: estado.modificado,
+        unidadesCarrito: contarUnidadesCarrito(estado.carrito),
+        ...operaciones,
+    }), [estado, operaciones]);
 
     return <InventarioContext.Provider value={valor}>{children}</InventarioContext.Provider>;
-}
-
-// Lee la lista guardada. Si falta o no tiene la forma esperada (por ejemplo, si alguien
-// editó el almacenamiento a mano), parte de los datos de ejemplo.
-function leerGuardado(inicial) {
-    try {
-        const guardado = JSON.parse(localStorage.getItem(CLAVE));
-        return Array.isArray(guardado) && guardado.length > 0 && guardado.every(esArticuloValido) ? guardado : inicial;
-    } catch {
-        return inicial;
-    }
-}
-
-function esArticuloValido(articulo) {
-    return articulo !== null && typeof articulo === 'object'
-        && ['id', 'sku', 'nombre', 'marca', 'tipo', 'formato', 'ubicacion'].every((campo) => typeof articulo[campo] === 'string')
-        && Number.isInteger(articulo.precio)
-        && Number.isInteger(articulo.stockMinimo)
-        && Number.isInteger(articulo.stock) && articulo.stock >= 0 && articulo.stock <= STOCK_MAXIMO;
 }
 
 export default InventarioProvider;

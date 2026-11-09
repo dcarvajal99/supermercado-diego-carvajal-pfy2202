@@ -1,6 +1,6 @@
 // Cabecera del sitio: el logotipo lleva al inicio desde cualquier página y a su lado va
 // el menú de artículos. Link reemplaza a <a href>: cambia la URL sin recargar el navegador.
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import MenuArticulos from './MenuArticulos.jsx';
 import { CONTENEDOR } from '../utilidades/estilos.js';
 

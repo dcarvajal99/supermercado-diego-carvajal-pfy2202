@@ -3,7 +3,24 @@
 import { TIPOS_PRODUCTO } from '../datos/articulos.js';
 import { normalizarTexto } from './formato.js';
 
+// Reglas del stock en un solo lugar: el stock es un número entero entre 0 y STOCK_MAXIMO.
+// El reductor, los formularios y la lectura de lo guardado usan estas funciones, así un
+// cambio del límite se aplica igual en todo el sitio.
 export const STOCK_MAXIMO = 9999;
+
+export function stockValido(valor) {
+    return Number.isInteger(valor) && valor >= 0 && valor <= STOCK_MAXIMO;
+}
+
+// Deja un valor dentro de los límites: −3 pasa a 0 y 10.500 pasa a 9.999.
+export function recortarStock(valor) {
+    return Math.min(STOCK_MAXIMO, Math.max(0, valor));
+}
+
+// ¿El stock puede cambiar en esa cantidad (positiva o negativa) sin salir de los límites?
+export function cambioPermitido(stock, cambio) {
+    return stockValido(stock + cambio);
+}
 
 // Los tres estados posibles del stock, con el texto que ve la persona.
 export const ESTADOS = [
@@ -23,6 +40,7 @@ export function nombreEstado(id) {
     return ESTADOS.find((estado) => estado.id === id)?.nombre ?? '';
 }
 
+// Nombre de la categoría (tipo de producto) a partir de su id.
 export function nombreTipo(id) {
     return TIPOS_PRODUCTO.find((tipo) => tipo.id === id)?.nombre ?? '';
 }
@@ -47,17 +65,28 @@ export function listarPorReponer(articulos) {
         .sort((a, b) => a.stock / (a.stockMinimo || 1) - b.stock / (b.stockMinimo || 1));
 }
 
-// Aplica los tres filtros de la lista. Un filtro vacío ('') no descarta nada.
-// La búsqueda compara sin tildes ni mayúsculas, por nombre, marca o SKU.
-export function filtrarArticulos(articulos, { busqueda, tipo, estado }) {
+// Filtra la lista según la categoría elegida, el estado del stock y el texto buscado.
+// Un filtro vacío ('') no descarta nada. filter() devuelve un arreglo nuevo: la lista
+// original del estado global queda intacta. La búsqueda compara sin tildes ni
+// mayúsculas, por nombre, marca o SKU.
+export function filtrarArticulos(articulos, { busqueda, categoria, estado }) {
     const texto = normalizarTexto(busqueda.trim());
     return articulos.filter((articulo) =>
-        (tipo === '' || articulo.tipo === tipo)
+        (categoria === '' || articulo.tipo === categoria)
         && (estado === '' || estadoStock(articulo) === estado)
         && (texto === '' || normalizarTexto(articulo.nombre + ' ' + articulo.marca + ' ' + articulo.sku).includes(texto)));
 }
 
+// Cuántos artículos hay de cada categoría: { lacteos: 3, ... }. Cuenta sobre la lista
+// completa, así el filtro muestra los totales aunque haya otra categoría elegida.
+export function contarPorCategoria(articulos) {
+    const cuentas = {};
+    for (const articulo of articulos) cuentas[articulo.tipo] = (cuentas[articulo.tipo] ?? 0) + 1;
+    return cuentas;
+}
+
 // Arma un artículo completo a partir de los campos del formulario (que llegan como texto).
+// Es una función pura: con los mismos datos y la misma lista, devuelve el mismo artículo.
 export function crearArticulo(datos, articulos) {
     return {
         id: generarId(datos, articulos),

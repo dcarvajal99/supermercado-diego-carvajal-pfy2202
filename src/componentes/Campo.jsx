@@ -1,5 +1,7 @@
 // Campo de formulario: etiqueta, control y mensaje de error enlazados entre sí.
-// Con children dibuja un <select> (sus opciones); sin children, un <input>.
+// Con children dibuja un <select> (sus opciones); sin children, un <input>. La `ref` que
+// recibe llega al control (en React 19 es una propiedad más), para que el formulario
+// pueda enfocarlo.
 import { CAMPO, ERROR, ETIQUETA } from '../utilidades/estilos.js';
 
 function Campo({ id, etiqueta, error, ayuda, children, ...propiedades }) {

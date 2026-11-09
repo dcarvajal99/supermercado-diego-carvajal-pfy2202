@@ -1,7 +1,7 @@
 // Menú inferior: la navegación general del sitio, fija al pie de la pantalla.
 // NavLink es el Link de React Router que sabe si su ruta está activa: le agrega
 // aria-current="page", recibe isActive para elegir las clases y navega sin recargar.
-import { NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router';
 
 const ENLACES = [
     { ruta: '/', texto: 'Inicio', Icono: IconoInicio },

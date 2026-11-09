@@ -1,12 +1,15 @@
-// Detalle de un artículo: la ruta dinámica /articulo/:id.
-// useParams entrega el :id de la URL y con él se busca el artículo en el estado global.
-// Si el id no existe, la página lo dice en vez de quedar en blanco.
-import { Link, useLocation, useParams } from 'react-router-dom';
+// Detalle de un artículo: la ruta dinámica /articulo/:id. Se llega desde la lista al hacer
+// clic en un artículo. useParams entrega el :id de la URL y con él se busca el artículo en
+// el estado global; desde aquí se agrega al carrito. Si el id no existe, la página lo dice
+// en vez de quedar en blanco.
+import { Link, useLocation, useParams } from 'react-router';
+import Boton from '../componentes/Boton.jsx';
 import EstadoStock from '../componentes/EstadoStock.jsx';
+import FormularioCarrito from '../componentes/FormularioCarrito.jsx';
 import FormularioMovimiento from '../componentes/FormularioMovimiento.jsx';
 import { useInventario } from '../contexto/InventarioContext.js';
 import { useTituloPagina } from '../hooks/useTituloPagina.js';
-import { BOTON_PRINCIPAL, ENLACE_SIMPLE, INTRODUCCION, PANEL, TITULO_PAGINA } from '../utilidades/estilos.js';
+import { ENLACE_SIMPLE, INTRODUCCION, PANEL, TITULO_PAGINA } from '../utilidades/estilos.js';
 import { contarUnidades, formatearPesos } from '../utilidades/formato.js';
 import { estadoStock, nombreTipo } from '../utilidades/inventario.js';
 
@@ -27,7 +30,7 @@ function DetalleArticulo() {
             <>
                 <h1 className={TITULO_PAGINA}>Artículo no encontrado</h1>
                 <p className="mt-2 mb-4">No existe un artículo con el código «{id}» en el inventario.</p>
-                <Link to={volver} className={BOTON_PRINCIPAL}>Volver a la lista de artículos</Link>
+                <Boton ruta={volver} variante="principal">Volver a la lista de artículos</Boton>
             </>
         );
     }
@@ -40,7 +43,7 @@ function DetalleArticulo() {
         ['Precio de venta', formatearPesos(articulo.precio)],
         ['Valor en stock', formatearPesos(articulo.precio * articulo.stock)],
         ['Marca', articulo.marca],
-        ['Tipo de producto', nombreTipo(articulo.tipo)],
+        ['Categoría', nombreTipo(articulo.tipo)],
         ['Ubicación', articulo.ubicacion],
     ];
 
@@ -51,7 +54,7 @@ function DetalleArticulo() {
                     <li><Link to={volver} className={ENLACE_SIMPLE}>Artículos</Link></li>
                     <li aria-hidden="true">/</li>
                     <li>
-                        <Link to={{ pathname: '/articulos', search: '?tipo=' + articulo.tipo }} className={ENLACE_SIMPLE}>
+                        <Link to={{ pathname: '/articulos', search: '?categoria=' + articulo.tipo }} className={ENLACE_SIMPLE}>
                             {nombreTipo(articulo.tipo)}
                         </Link>
                     </li>
@@ -86,16 +89,24 @@ function DetalleArticulo() {
                     <p className="text-sm text-suave">{textoReposicion(articulo)}</p>
                 </section>
 
-                <section className={PANEL + ' lg:col-span-5'} aria-labelledby="titulo-movimiento">
-                    <h2 id="titulo-movimiento" className="mb-2 font-semibold">Registrar movimiento</h2>
-                    {/* key: la ruta reutiliza esta página al pasar a otro artículo;
-                        con una key distinta el formulario parte de cero */}
-                    <FormularioMovimiento
-                        key={articulo.id}
-                        articulo={articulo}
-                        onRegistrar={(cambio) => ajustarStock(articulo.id, cambio)}
-                    />
-                </section>
+                {/* key: la ruta reutiliza esta página al pasar a otro artículo; con una key
+                    distinta cada formulario parte de cero */}
+                <div className="grid content-start gap-3 lg:col-span-5">
+                    <section className={PANEL} aria-labelledby="titulo-carrito">
+                        <h2 id="titulo-carrito" className="mb-2 font-semibold">Agregar al carrito</h2>
+                        <FormularioCarrito key={articulo.id} articulo={articulo} />
+                    </section>
+
+                    <section className={PANEL} aria-labelledby="titulo-movimiento">
+                        <h2 id="titulo-movimiento" className="font-semibold">Ajuste de inventario</h2>
+                        <p className="mb-3 text-sm text-suave">Para registrar mercadería que llegó (entrada) o mermas (salida).</p>
+                        <FormularioMovimiento
+                            key={articulo.id}
+                            articulo={articulo}
+                            onRegistrar={(cambio) => ajustarStock(articulo.id, cambio)}
+                        />
+                    </section>
+                </div>
             </div>
 
             {/* Navegación entre artículos por la misma ruta dinámica; conserva los filtros de origen */}

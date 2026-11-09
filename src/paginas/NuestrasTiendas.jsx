@@ -1,11 +1,12 @@
 // Página «Nuestras tiendas»: las sucursales con dirección, horario y servicios.
 // El filtro por región vive en la URL (?region=biobio), igual que los filtros de la
 // lista de artículos: se puede compartir el enlace a las tiendas de una sola región.
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router';
+import GrupoOpciones from '../componentes/GrupoOpciones.jsx';
 import TarjetaTienda from '../componentes/TarjetaTienda.jsx';
 import { useTituloPagina } from '../hooks/useTituloPagina.js';
 import { REGIONES, TIENDAS } from '../datos/tiendas.js';
-import { BOTON_CHICO, BOTON_CHICO_ACTIVO, INTRODUCCION, TITULO_PAGINA } from '../utilidades/estilos.js';
+import { INTRODUCCION, TITULO_PAGINA } from '../utilidades/estilos.js';
 
 function NuestrasTiendas() {
     useTituloPagina('Nuestras tiendas');
@@ -31,22 +32,9 @@ function NuestrasTiendas() {
                 </p>
             </div>
 
-            <div className="mb-3 flex flex-wrap items-center gap-2" role="group" aria-label="Filtrar por región">
-                <span className="mr-1 text-sm text-suave">Región:</span>
-                {opciones.map((opcion) => (
-                    <button
-                        key={opcion.id}
-                        type="button"
-                        className={region === opcion.id ? BOTON_CHICO_ACTIVO : BOTON_CHICO}
-                        aria-pressed={region === opcion.id}
-                        onClick={() => elegirRegion(opcion.id)}
-                    >
-                        {opcion.nombre}
-                    </button>
-                ))}
-            </div>
+            <GrupoOpciones etiqueta="Región" opciones={opciones} valor={region} onElegir={elegirRegion} />
 
-            <p className="mb-4 text-sm text-suave" aria-live="polite">
+            <p className="mt-3 mb-4 text-sm text-suave" aria-live="polite">
                 {visibles.length === 1 ? '1 tienda' : visibles.length + ' tiendas'}
             </p>
 

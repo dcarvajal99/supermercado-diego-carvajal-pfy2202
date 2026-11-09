@@ -9,12 +9,13 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist -m \"Publica el sitio del supermercado\" -u \"dcarvajal99 <eldiiewho@gmail.com>\""
+    "deploy": "gh-pages -d dist -m \"Publica el sitio del supermercado\" -u \"dcarvajal99 <eldiiewho@gmail.com>\"",
+    "test": "vitest run"
   },
   "dependencies": {
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
-    "react-router-dom": "^7.18.4"
+    "react-router": "^7.18.4"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
@@ -24,6 +25,7 @@
     "gh-pages": "6.3.0",
     "oxlint": "^1.89.0",
     "tailwindcss": "^4.3.3",
-    "vite": "^8.3.5"
+    "vite": "^8.3.5",
+    "vitest": "^4.1.12"
   }
 }
