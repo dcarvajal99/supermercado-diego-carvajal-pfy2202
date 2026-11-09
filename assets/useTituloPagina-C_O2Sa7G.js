@@ -1,0 +1,1 @@
+import{C as e,T as t}from"./estilos-I5R7K9Vi.js";var n=t(e(),1);function r(e){(0,n.useEffect)(()=>{document.title=e+` | Despensa Austral`},[e])}export{r as t};
